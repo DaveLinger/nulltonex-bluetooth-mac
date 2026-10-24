@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Build output
+macos/build/
+
+# Local research data: HCI traces contain ALL of the Mac's Bluetooth traffic (other devices too)
+captures/
+jobs/
+
+# Third-party sample label (download it yourself; see docs/rendering.md)
+fixtures/pirateship-ups-void-4x6.pdf

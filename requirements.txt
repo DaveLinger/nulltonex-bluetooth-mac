@@ -1,0 +1,5 @@
+# Python reference implementation, research scripts and tests (the macOS app needs none of these).
+bleak==3.0.2
+pillow==13.0.0
+pypdfium2==5.14.0
+python-barcode==0.16.1

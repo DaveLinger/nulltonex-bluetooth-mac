@@ -1,0 +1,127 @@
+{
+  "captured_at": "2026-10-24T19:53:07.619458+00:00",
+  "devices": [
+    {
+      "name": "Y813_56F7_BLE",
+      "corebluetooth_id": "<host-specific CoreBluetooth UUID>",
+      "rssi": -61,
+      "tx_power": 5,
+      "adv_service_uuids": [
+        "000018f0-0000-1000-8000-00805f9b34fb",
+        "e7810a71-73ae-499d-8c15-faa9aef0c3f2"
+      ],
+      "manufacturer_data": {},
+      "service_data": {},
+      "services": [
+        {
+          "uuid": "49535343-fe7d-4ae5-8fa9-9fafd205e455",
+          "description": "Unknown",
+          "characteristics": [
+            {
+              "uuid": "49535343-1e4d-4bd9-ba61-23c647249616",
+              "handle": 9,
+              "description": "Unknown",
+              "properties": [
+                "notify"
+              ],
+              "max_write_without_response_size": 244,
+              "descriptors": [
+                {
+                  "uuid": "00002902-0000-1000-8000-00805f9b34fb",
+                  "handle": 11,
+                  "description": "Client Characteristic Configuration"
+                }
+              ]
+            },
+            {
+              "uuid": "49535343-8841-43f4-a8d4-ecbe34729bb3",
+              "handle": 12,
+              "description": "Unknown",
+              "properties": [
+                "write",
+                "write-without-response"
+              ],
+              "max_write_without_response_size": 244,
+              "descriptors": []
+            },
+            {
+              "uuid": "49535343-aca3-481c-91ec-d85e28a60318",
+              "handle": 14,
+              "description": "Unknown",
+              "properties": [
+                "notify",
+                "write"
+              ],
+              "max_write_without_response_size": 244,
+              "descriptors": [
+                {
+                  "uuid": "00002902-0000-1000-8000-00805f9b34fb",
+                  "handle": 16,
+                  "description": "Client Characteristic Configuration"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "uuid": "000018f0-0000-1000-8000-00805f9b34fb",
+          "description": "Vendor specific",
+          "characteristics": [
+            {
+              "uuid": "00002af1-0000-1000-8000-00805f9b34fb",
+              "handle": 18,
+              "description": "Electric Current Statistics",
+              "properties": [
+                "notify"
+              ],
+              "max_write_without_response_size": 244,
+              "descriptors": [
+                {
+                  "uuid": "00002902-0000-1000-8000-00805f9b34fb",
+                  "handle": 20,
+                  "description": "Client Characteristic Configuration"
+                }
+              ]
+            },
+            {
+              "uuid": "00002af0-0000-1000-8000-00805f9b34fb",
+              "handle": 21,
+              "description": "Electric Current Specification",
+              "properties": [
+                "write",
+                "write-without-response"
+              ],
+              "max_write_without_response_size": 244,
+              "descriptors": []
+            }
+          ]
+        },
+        {
+          "uuid": "e7810a71-73ae-499d-8c15-faa9aef0c3f2",
+          "description": "Unknown",
+          "characteristics": [
+            {
+              "uuid": "bef8d6c9-9c21-4c9e-b632-bd58c1009f9f",
+              "handle": 24,
+              "description": "Unknown",
+              "properties": [
+                "notify",
+                "read",
+                "write"
+              ],
+              "max_write_without_response_size": 244,
+              "descriptors": [
+                {
+                  "uuid": "00002902-0000-1000-8000-00805f9b34fb",
+                  "handle": 26,
+                  "description": "Client Characteristic Configuration"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "mtu_size": 247
+    }
+  ]
+}
