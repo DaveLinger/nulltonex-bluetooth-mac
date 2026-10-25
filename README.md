@@ -30,7 +30,7 @@ The app is open source and ad-hoc signed, not signed with a paid Apple Developer
 
 ### Requirements
 
-- A Mac with Bluetooth, on macOS 14 or later (developed on macOS 27; earlier versions untested)
+- A Mac with Bluetooth, Intel or Apple Silicon. Developed on macOS 27, earlier versions untested.
 - An admin account, to add the printer
 - A NULLTONEX Y813 with 100 × 150 mm (4 × 6) labels
 
@@ -57,28 +57,11 @@ The Y813 doesn't use Bluetooth pairing. **Don't pair it in System Settings, and 
 
 Chrome's built-in dialog doesn't show Print Quality. Use *Print using system dialog… (⌥⌘P)* to get it.
 
-From the command line:
-
-```bash
-lp -d Y813 label.pdf
-lp -d Y813 -o print-quality=5 label.pdf    # High
-```
-
 ### How labels are fitted
 
 Label PDFs are usually exactly 4 × 6 in (101.6 × 152.4 mm), while the Y813's labels are 100 × 150 mm. The service renders the PDF directly at 8 dots/mm and prints it at **100 %**, centered. It shrinks only if real content would otherwise be cut off. That shrink is uniform and redrawn from the vector PDF, typically to about 98.4 %. Page-edge frame lines don't count as content. Details: [docs/rendering.md](docs/rendering.md).
 
 Accepted pages are 4 × 6 in or 100 × 150 mm, portrait or landscape. Other sizes (for example a Letter sheet) are rejected with an error rather than printed wrong.
-
-## Configuration
-
-The Normal density lives in the LaunchAgent's arguments; Draft and High stay 3 steps either side. Re-running the installer resets it to 11. To make Normal 12:
-
-```bash
-plutil -replace ProgramArguments.3 -string 12 ~/Library/LaunchAgents/local.y813.printservice.plist
-launchctl bootout gui/$(id -u)/local.y813.printservice
-launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/local.y813.printservice.plist
-```
 
 ## Troubleshooting
 
