@@ -1,7 +1,7 @@
 #!/bin/zsh
 # Y813 Print Service installer: makes a NULLTONEX Y813 (Bluetooth LE) show up as a normal macOS printer.
 #
-#   curl -fsSL https://raw.githubusercontent.com/DaveLinger/y813-macos-print/main/install.sh | zsh
+#   curl -fsSL https://raw.githubusercontent.com/DaveLinger/nulltonex-bluetooth-mac/main/install.sh | zsh
 #
 # Options:
 #   --from-source   build the app from this checkout instead of downloading it (needs Xcode Command Line Tools)
@@ -10,7 +10,7 @@
 #   --uninstall     remove the print queue, background service and app
 set -euo pipefail
 
-REPO=DaveLinger/y813-macos-print
+REPO=DaveLinger/nulltonex-bluetooth-mac
 ZIP_URL="${Y813_ZIP_URL:-https://github.com/$REPO/releases/latest/download/Y813PrintService.zip}"
 LABEL=local.y813.printservice
 APP="$HOME/Applications/Y813PrintService.app"
