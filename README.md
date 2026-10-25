@@ -6,7 +6,7 @@
 
 Print 4×6 shipping labels to a **NULLTONEX thermal label printer over Bluetooth**, straight from the normal Print dialog on your Mac. It works with labels from Pirate Ship, Shopify, Etsy, eBay, Amazon, USPS, UPS, FedEx or anywhere else that gives you a 4×6 PDF. You don't need a USB cable, and you don't need the FlashLabel Pro or Pixmate app.
 
-Once installed, your Mac has a printer called **Y813 Label Printer**. Print a label to it like any other printer, and it comes out at the printer's full 203 dpi.
+It works as a **NULLTONEX Bluetooth printer driver for macOS**: once installed, your Mac has a printer called **Y813 Label Printer**. Print a label to it like any other printer, and it comes out at the printer's full 203 dpi.
 
 ![Printing a 4×6 UPS label from Chrome to the Y813 Label Printer](docs/images/print-dialog.png)
 
