@@ -4,27 +4,6 @@ Print 4×6 shipping labels from the **standard macOS Print dialog** to a **NULLT
 
 It's a small native macOS app that shows up as a regular printer called **Y813 Label Printer**. Print a label PDF from Preview, Chrome, Pirate Ship or any other app, and it goes to the printer over BLE at the printer's native 203 dpi, without the shrinking Pixmate applies.
 
-```
-App ─► Print dialog ─► CUPS queue "Y813" ─► ipp://127.0.0.1:8631 ─► Y813PrintService.app ─► BLE ─► Y813
-```
-
-## Status
-
-Works end to end. It was developed and tested on:
-- macOS 27.0.1 on an Apple M2
-- a NULLTONEX Y813 (`Y813_XXXX_BLE`) with 100 × 150 mm labels
-- printing from Chrome, Preview and `lp`
-
-Other macOS versions and other label sizes are untested.
-
-## Requirements
-
-- A Mac with Bluetooth, on macOS 14 or later (developed on macOS 27; earlier versions untested)
-- An admin account, to add the printer
-- A NULLTONEX Y813 with 100 × 150 mm (4 × 6) labels
-
-No Xcode or developer tools are needed, and neither is Pixmate.
-
 ## Install
 
 Open **Terminal** and run:
@@ -49,17 +28,23 @@ If you'd rather not pipe a script into your shell, download `install.sh` and `Y8
 
 The app is open source and ad-hoc signed, not signed with a paid Apple Developer ID. Installing through Terminal avoids the Gatekeeper "unidentified developer" block that a double-clicked download would hit.
 
+### Requirements
+
+- A Mac with Bluetooth, on macOS 14 or later (developed on macOS 27; earlier versions untested)
+- An admin account, to add the printer
+- A NULLTONEX Y813 with 100 × 150 mm (4 × 6) labels
+
+No Xcode or developer tools are needed, and neither is Pixmate.
+
 ## Pairing: none needed
 
 The Y813 doesn't use Bluetooth pairing. **Don't pair it in System Settings, and you don't need Pixmate.** Turn the printer on and print: the service finds any printer advertising as `Y813_…` and connects for each job.
-
-The printer accepts one connection at a time. If it's connected to Pixmate or a phone, quit that app (or turn off the phone's Bluetooth) first.
 
 **Security note:** with no pairing, anyone within Bluetooth range (roughly 10 m) can send the printer a job while nothing else is connected to it. That's how the printer's firmware works, whatever app you use. The practical risk is wasted labels, since the printer stores no data. This service connects only while printing.
 
 ## Printing
 
-1. Turn the printer on. Quit Pixmate, since the printer accepts one connection at a time.
+1. Turn the printer on.
 2. Open the label PDF and choose **Print** → **Y813 Label Printer**.
 3. Set **Paper size: 4 × 6 in** (the default), and keep scaling at **Default / 100 %**. Don't use "fit to page": the service does its own fitting.
 4. Optional: **Print Quality** sets darkness.
@@ -100,10 +85,17 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/local.y813.printservice.
 - **Log:** `~/Library/Logs/Y813PrintService.log` records each job's scale, any cropping, the BLE steps and the status byte. It never records label content.
 - **Job failed:** `lpstat -W completed -l -o Y813` shows CUPS's view. The service's reason (for example "printer not found") is in the log.
 - **"timed out waiting for Bluetooth" / "Bluetooth permission not granted":** turn on **Y813PrintService** in System Settings → Privacy & Security → Bluetooth, then run the install command again.
-- **"Printer not found":** the printer is off, out of range, or still connected to Pixmate or a phone.
+- **"Printer not found":** the printer is off or out of range, or another device is connected to it.
+- **Only one connection at a time:** the printer accepts a single Bluetooth connection. If another device or app, such as a phone, is connected to it, the Mac can't reach it. Disconnect the other device and print again. This service connects only while a job is printing, so it won't block other devices between jobs.
 - **A failed job never reprints on its own.** The service retries only failures that happened before any data was sent, so a paid label can't print twice.
 
 ## How it works
+
+```
+App ─► Print dialog ─► CUPS queue "Y813" ─► ipp://127.0.0.1:8631 ─► Y813PrintService.app ─► BLE ─► Y813
+```
+
+The app is a small local print server. macOS's print system hands it the label PDF, and it renders the PDF at the printer's 203 dpi and sends it over Bluetooth LE.
 
 | Doc | Contents |
 |---|---|
@@ -113,6 +105,15 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/local.y813.printservice.
 | [docs/gatt-map.md](docs/gatt-map.md) | The printer's GATT table |
 | [docs/app-inspection.md](docs/app-inspection.md) | What Pixmate's binary revealed (static strings only) |
 | [docs/capturing.md](docs/capturing.md) | How the protocol was captured with PacketLogger, and how to reproduce it |
+
+### Tested with
+
+Developed and tested on:
+- macOS 27.0.1 on an Apple M2
+- a NULLTONEX Y813 (`Y813_XXXX_BLE`) with 100 × 150 mm labels
+- printing from Chrome, Preview and `lp`
+
+Other macOS versions and other label sizes are untested.
 
 ## Development
 
