@@ -206,6 +206,31 @@ final class Y813Link: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     func peripheralIsReady(toSendWriteWithoutResponse p: CBPeripheral) { update { readyToSend = true } }
 }
 
+/// First-run helper: triggers the Bluetooth permission prompt and reports the user's answer.
+/// Run via LaunchServices (`open -W -a … --args authorize`); launchd-started instances may
+/// never get a visible prompt. Logs "authorize: allowed|denied|timeout" and exits 0/2/3.
+final class BluetoothAuthorizer: NSObject, CBCentralManagerDelegate {
+    private var central: CBCentralManager?
+
+    func run(timeout: TimeInterval = 180) {
+        central = CBCentralManager(delegate: self, queue: .main)
+        DispatchQueue.main.asyncAfter(deadline: .now() + timeout) { self.finish("timeout", 3) }
+    }
+
+    func centralManagerDidUpdateState(_ c: CBCentralManager) {
+        switch CBManager.authorization {
+        case .allowedAlways: finish("allowed", 0)
+        case .denied, .restricted: finish("denied", 2)
+        default: break  // still waiting for the user
+        }
+    }
+
+    private func finish(_ result: String, _ code: Int32) {
+        log("authorize: \(result)")
+        exit(code)
+    }
+}
+
 /// Classic TSPL <ESC>!? bits. Only 0x00 (ready) has been observed on the Y813.
 enum PrinterStatus {
     static func reasons(_ b: UInt8) -> [String] {

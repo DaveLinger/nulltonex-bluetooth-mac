@@ -49,6 +49,6 @@ Advertised capabilities:
 
 ## Known limitations
 
-- **Bluetooth permission prompt.** After the first install, the prompt may not appear for the launchd-started instance. Launching the app once via `open` shows it (see README → Troubleshooting).
-- **Ad-hoc signing.** The app is signed ad-hoc. macOS may re-ask for Bluetooth permission after a rebuild, depending on the OS version.
+- **Bluetooth permission prompt.** A launchd-started instance may never show the permission prompt, so `install.sh` first runs `Y813PrintService authorize` through LaunchServices (`open -W`). That shows the prompt, waits for the answer, and only then loads the LaunchAgent.
+- **Ad-hoc signing.** Releases are ad-hoc signed (no paid Developer ID), so they're installed from Terminal rather than double-clicked. Files fetched with `curl` aren't quarantined. macOS may re-ask for Bluetooth permission after an update.
 - **Media.** Only 100 × 150 mm label stock is tested. Other sizes would need new media entries and a new `SIZE`.

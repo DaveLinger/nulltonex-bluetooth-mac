@@ -4,6 +4,8 @@
 //   Y813PrintService render <in.pdf> <out.pbm> [--fit auto|crop|shrink]
 //   Y813PrintService encode <in.pbm> <out.bin> --width-mm W --height-mm H [--density N]
 //   Y813PrintService print <in.pdf> [--density N]            render + send (needs Bluetooth permission)
+//   Y813PrintService authorize                              ask for Bluetooth permission (installer, via `open`)
+//   Y813PrintService version
 //
 // Anything touching Bluetooth must run as this app (launchd or `open`), not from a shell
 // inside another app, or TCC kills the process.
@@ -79,6 +81,16 @@ case "print":
         let status = try Y813Link().send(job, log: log)
         log("print: status \(status.map { String(format: "0x%02X", $0) } ?? "none")")
     } catch { fail("\(error)") }
+
+case "authorize":
+    let authorizer = BluetoothAuthorizer()
+    authorizer.run()
+    let app = NSApplication.shared
+    app.setActivationPolicy(.prohibited)
+    app.run()
+
+case "version":
+    print(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev")
 
 case "serve":
     signal(SIGPIPE, SIG_IGN)

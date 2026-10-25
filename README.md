@@ -19,24 +19,43 @@ Other macOS versions and other label sizes are untested.
 
 ## Requirements
 
-- macOS on a Mac with Bluetooth LE
-- Xcode **Command Line Tools** (`xcode-select --install`), for `swiftc`. Full Xcode isn't needed.
-- An admin account, to add the print queue
+- A Mac with Bluetooth, on macOS 14 or later (developed on macOS 27; earlier versions untested)
+- An admin account, to add the printer
+- A NULLTONEX Y813 with 100 × 150 mm (4 × 6) labels
+
+No Xcode or developer tools are needed, and neither is Pixmate.
 
 ## Install
 
+Open **Terminal** and run:
+
 ```bash
-git clone https://github.com/DaveLinger/y813-macos-print.git
-cd y813-macos-print
-macos/install.sh --queue
+curl -fsSL https://raw.githubusercontent.com/DaveLinger/y813-macos-print/main/install.sh | zsh
 ```
 
-This does three things:
-- builds `Y813PrintService.app` and installs it to `~/Applications`
-- starts it at login with a LaunchAgent (`local.y813.printservice`)
-- adds a CUPS queue named **Y813** (IPP Everywhere, pointing at `ipp://127.0.0.1:8631/ipp/print`)
+The installer:
+1. downloads the latest release of **Y813PrintService.app** to `~/Applications`
+2. asks macOS for Bluetooth permission; **click Allow** when "Y813 Print Service" asks to use Bluetooth
+3. starts a small background service that runs at login
+4. adds a printer called **Y813 Label Printer**
 
-When macOS asks whether **Y813 Print Service** may use Bluetooth, click **Allow**. If no prompt appears, see [Troubleshooting](#troubleshooting).
+Run the same command again to update. To remove everything:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/DaveLinger/y813-macos-print/main/install.sh | zsh -s -- --uninstall
+```
+
+If you'd rather not pipe a script into your shell, download `install.sh` and `Y813PrintService.zip` from the [latest release](https://github.com/DaveLinger/y813-macos-print/releases/latest), read the script, then run `zsh install.sh --app ~/Downloads/Y813PrintService.zip`.
+
+The app is open source and ad-hoc signed, not signed with a paid Apple Developer ID. Installing through Terminal avoids the Gatekeeper "unidentified developer" block that a double-clicked download would hit.
+
+## Pairing: none needed
+
+The Y813 doesn't use Bluetooth pairing. **Don't pair it in System Settings, and you don't need Pixmate.** Turn the printer on and print: the service finds any printer advertising as `Y813_…` and connects for each job.
+
+The printer accepts one connection at a time. If it's connected to Pixmate or a phone, quit that app (or turn off the phone's Bluetooth) first.
+
+**Security note:** with no pairing, anyone within Bluetooth range (roughly 10 m) can send the printer a job while nothing else is connected to it. That's how the printer's firmware works, whatever app you use. The practical risk is wasted labels, since the printer stores no data. This service connects only while printing.
 
 ## Printing
 
@@ -68,7 +87,7 @@ Accepted pages are 4 × 6 in or 100 × 150 mm, portrait or landscape. Other size
 
 ## Configuration
 
-The Normal density lives in the LaunchAgent's arguments; Draft and High stay 3 steps either side. To make Normal 12:
+The Normal density lives in the LaunchAgent's arguments; Draft and High stay 3 steps either side. Re-running the installer resets it to 11. To make Normal 12:
 
 ```bash
 plutil -replace ProgramArguments.3 -string 12 ~/Library/LaunchAgents/local.y813.printservice.plist
@@ -80,24 +99,9 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/local.y813.printservice.
 
 - **Log:** `~/Library/Logs/Y813PrintService.log` records each job's scale, any cropping, the BLE steps and the status byte. It never records label content.
 - **Job failed:** `lpstat -W completed -l -o Y813` shows CUPS's view. The service's reason (for example "printer not found") is in the log.
-- **No Bluetooth prompt / "timed out waiting for Bluetooth":** launch the app once through LaunchServices, click Allow, then restart the agent:
-  ```bash
-  launchctl bootout gui/$(id -u)/local.y813.printservice
-  open -a ~/Applications/Y813PrintService.app --args serve
-  ```
-  After you click Allow:
-  ```bash
-  pkill -f Y813PrintService.app; launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/local.y813.printservice.plist
-  ```
-  You can review the permission in System Settings → Privacy & Security → Bluetooth.
-- **"Printer not found":** the printer is off, out of range, or still connected to Pixmate (or a phone).
+- **"timed out waiting for Bluetooth" / "Bluetooth permission not granted":** turn on **Y813PrintService** in System Settings → Privacy & Security → Bluetooth, then run the install command again.
+- **"Printer not found":** the printer is off, out of range, or still connected to Pixmate or a phone.
 - **A failed job never reprints on its own.** The service retries only failures that happened before any data was sent, so a paid label can't print twice.
-
-## Uninstall
-
-```bash
-macos/install.sh --uninstall    # removes the queue, the LaunchAgent and the app
-```
 
 ## How it works
 
@@ -113,18 +117,26 @@ macos/install.sh --uninstall    # removes the queue, the LaunchAgent and the app
 ## Development
 
 ```
-macos/            Swift print service (build.sh, install.sh, Sources/)
+install.sh        installer (downloads the release, or --from-source)
+macos/            Swift print service (build.sh, Sources/)
 src/y813/         Python reference: tspl.py (encoder), raster.py (PDF → raster), ble.py (bleak sender)
 scripts/          y813_print.py (PDF → job / send), research tools (recon, pklg extractor, TSPL decoder, fixtures)
 tests/            unittest suite; tests/golden/ holds the byte streams Pixmate sent (test images only)
 fixtures/         generated test labels
 ```
 
+Building from source needs the Xcode Command Line Tools (`xcode-select --install`):
+
 ```bash
+git clone https://github.com/DaveLinger/y813-macos-print.git && cd y813-macos-print
+./install.sh --from-source                      # build this checkout and install it
+
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-macos/build.sh                                  # needed for the Swift parity tests
+macos/build.sh                                  # universal app (add "native" for a faster single-arch build)
 .venv/bin/python -m unittest discover -s tests
 ```
+
+**Releases:** bump `VERSION`, commit, then push a matching tag (`git tag v0.1.1 && git push --tags`). GitHub Actions builds the universal app, runs the tests, and publishes `Y813PrintService.zip` plus `install.sh`.
 
 The Swift encoder must stay **byte-identical** to Pixmate's captured jobs and the Python encoder, and the renderers must agree (`tests/test_swift_port.py`). Three optional tests use Pirate Ship's sample UPS label. Save it as `fixtures/pirateship-ups-void-4x6.pdf` to enable them; it isn't redistributed here.
 
