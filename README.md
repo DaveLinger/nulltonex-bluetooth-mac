@@ -1,4 +1,4 @@
-# NULLTONEX Bluetooth Label Printer for Mac
+# NULLTONEX Label Printer Bluetooth Driver for Mac
 
 [![Latest release](https://img.shields.io/github/v/release/DaveLinger/nulltonex-bluetooth-mac)](https://github.com/DaveLinger/nulltonex-bluetooth-mac/releases/latest)
 ![macOS](https://img.shields.io/badge/macOS-Intel%20%7C%20Apple%20Silicon-lightgrey)
